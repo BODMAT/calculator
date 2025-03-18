@@ -14,8 +14,11 @@ export function Operations() {
                 {/* GRID FOR BUTTONS */}
                 <div className={`grid grid-rows-5 gap-[20px] max-[400px]:gap-[10px] grid-cols-4 grid-auto-flow-column`}>
                     <div className="col-span-3 grid grid-cols-3 grid-rows-1 gap-[20px] max-[400px]:gap-[10px] bg-[#ffffff4f] rounded-[100px]">
-                        <CustomButton hasBG={false}>AC</CustomButton>
+                        {/* UNDO */}
+                        <CustomButton hasBG={false}>UNDO</CustomButton>
+                        {/* Clear all */}
                         <CustomButton hasBG={false}>C</CustomButton>
+
                         <CustomButton hasBG={false}>%</CustomButton>
                     </div>
                     {/* Basic operations */}
@@ -51,10 +54,10 @@ export function Operations() {
                                 exit={{ opacity: 0, transform: 'translateY(100px)' }}
                                 transition={{ duration: 0.1, ease: 'easeInOut' }}
                             >
-                                <CustomButton hasBG={false}>Sqrt</CustomButton>
-                                <CustomButton hasBG={false}>Pow</CustomButton>
-                                <CustomButton hasBG={false}>Ln</CustomButton>
-                                <CustomButton hasBG={false}>Pi</CustomButton>
+                                <CustomButton hasBG={false}>√</CustomButton>
+                                <CustomButton hasBG={false}>^</CustomButton>
+                                <CustomButton hasBG={false}>ln</CustomButton>
+                                <CustomButton hasBG={false}>π</CustomButton>
                             </motion.div>
                         )}
                     </AnimatePresence>
