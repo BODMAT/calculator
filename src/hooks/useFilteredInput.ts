@@ -13,11 +13,11 @@ export const useFilteredInput = () => {
             .replace(/\(\)/g, "") // Забороняє "()"
             .replace(/\.\)/g, "") // Забороняє ".)"
             // unhistoryble
-            .replace(/(\d+)%/g, (match: string, number: string): string => {
+            .replace(/(\d+)%/g, (_: string, number: string): string => {
                 const percentageValue = (Number(number) / 100).toString();
                 return percentageValue;
             })
             .replace(/([+\-*/])\1+/g, "$1") // Запобігає двом операторам
-            .replace(/(\d+)\.(?=\d*\.)/g, (match: string, number: string): string => `${number}`); // Видаляє зайві крапки
+            .replace(/(\d+)\.(?=\d*\.)/g, (_: string, number: string): string => `${number}`); // Видаляє зайві крапки
     }, []);
 };

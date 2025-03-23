@@ -1,7 +1,7 @@
 import { useThemeStore } from "../store/theme";
 
 export function SwitchTheme() {
-    const { theme, toggleTheme } = useThemeStore();
+    const { toggleTheme } = useThemeStore();
     return (
         <>
             {/* theme change */}
