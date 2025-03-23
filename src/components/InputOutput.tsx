@@ -1,6 +1,8 @@
-import { useForm } from "react-hook-form"
-import { useCalculatorStore } from "../store/calculator"
+import { useForm } from "react-hook-form";
+import { useCalculatorStore } from "../store/calculator";
 import { useEffect } from "react";
+import { useFilteredInput } from "../hooks/useFilteredInput";
+
 export function InputOutput() {
     const { execute, expression, history } = useCalculatorStore();
     const { register, setValue, watch } = useForm<{ inputExpression: string }>({
@@ -9,13 +11,18 @@ export function InputOutput() {
     });
     const value = watch("inputExpression");
 
-    // При зміні виразу в інпуті, оновлюємо його в сторінці
     useEffect(() => {
         setValue("inputExpression", expression);
     }, [expression, history]);
 
     const calcinputExpression = (expr: string) => {
-        const sanitizedExpr = expr.replace(/[*+\-/]$/, "");
+        const sanitizedExpr = expr
+            .replace(/√/g, "Math.sqrt")    // Заміна √ на Math.sqrt
+            .replace(/\^/g, "**")          // Заміна ^ на **
+            .replace(/ln/g, "Math.log")    // Заміна ln на Math.log
+            .replace(/π/g, Math.PI.toFixed(5)) // Заміна π на Math.PI з точністю до 2 знаків
+            .replace(/\b0{2,}\b/g, "0")  // Заміна чисел, що складаються з двох і більше нулів перед крапкою, на "0"
+            .replace(/[\+\-\*\/]$/, ""); //видаляє останній оператор якщо є
         try {
             return sanitizedExpr ? eval(sanitizedExpr).toString() : "0";
         } catch {
@@ -23,16 +30,17 @@ export function InputOutput() {
         }
     };
 
-    //async cause of useEffect that upd value after  setValue("inputExpression", result, { shouldValidate: true });
+    //async cause of useEffect that upd value after setValue
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            await execute(value)
+            await execute(value, true);
             const result = calcinputExpression(value);
+            await execute(result, true);
+
             setValue("inputExpression", result, { shouldValidate: true });
         }
     };
 
-    //!=================
     const checkForIfHistorible = (value: string) => {
         // шукаю перший оператор з кінця
         const operatorIndex = value.split('').reverse().findIndex(char => /[+\-*/]/.test(char));
@@ -47,32 +55,25 @@ export function InputOutput() {
     };
 
     const containsOperator = /[+\-*/]/.test(value.slice(1));
-
+    const filteredInput = useFilteredInput();
     return (
         <div className="w-full flex flex-col gap-2 !p-[9px_34px] min-h-[100px]" >
+            {/* MY INPUT */}
             <input
                 {...register("inputExpression", {
                     onChange: (e) => {
-                        const filteredValue = e.target.value
-                            .replace(/[^0-9+\-*/().]/g, "")   // Видалити всі символи, крім дозволених
-                            .replace(/([+\-*/.])\1+/g, "$1") // Запобігає двом операторам або крапкам підряд
-                            .replace(/([0-9])\(/g, "$1*(") // Замінює "число(" на "число*("
-                            .replace(/\)([0-9])/g, ")*$1") // Замінює ")число" на ")*число"
-                            .replace(/^(?!-)[+\-*/]/, "") // Видаляє всі знаки з першого (нульового) місця, крім "-"
-                            .replace(/(^|[+\-*/])0(?=\d)/g, "$10.") // Замінює "0" перед числом на "0."
-                            .replace(/([+\-*/])\./g, "$1") // Видаляє крапку після оператора
-                            .replace(/^(0{1,})(?=\.)/, "0") // Залишає тільки один нуль перед десятковою крапкою
-                            .replace(/\.(?=.*\.)/g, "") // Забороняє введення більше ніж однієї крапки
-                            .replace(/^0+(?=\d)/, "") // Видаляє всі нулі з початку числа
-
+                        console.log("onChange trigg");
+                        const filteredValue = filteredInput(e.target.value);
                         setValue("inputExpression", filteredValue, { shouldValidate: true });
                         checkForIfHistorible(filteredValue);
                     },
                 })}
                 className="w-full text-right text-adaptive-current text-[#373737] dark:text-[#FBFBFB] transition-colors duration-500"
+                id="input"
                 autoFocus
                 onKeyDown={handleKeyDown}
             />
+            {/* MY OUTPUT */}
             <div className="w-full text-right text-adaptive-prev text-[#3737376d] dark:text-[#fbfbfb72] transition-colors duration-500">
                 {(value && containsOperator) ? `= ${calcinputExpression(value)}` : ""}
             </div>

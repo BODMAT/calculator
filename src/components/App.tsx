@@ -1,16 +1,15 @@
 import { useEffect } from "react";
-import { Header } from "../Header";
-import { InputOutput } from "../InputOutput";
-import { Operations } from "../Operations";
+import { Header } from "./Header";
+import { InputOutput } from "./InputOutput";
+import { Operations } from "./Operations";
+import { useThemeStore } from "./../store/theme";
 
 export function App() {
+    const theme = useThemeStore((state) => state.theme);
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-            document.documentElement.classList.toggle('light', savedTheme === 'light');
-        }
-    }, []);
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('light', theme === 'light');
+    }, [theme]);
 
     return (
         <div className="calc-container">
